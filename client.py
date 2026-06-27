@@ -36,7 +36,7 @@ def silent_install(package):
     """Install package silently - no output"""
     try:
         subprocess.run(
-            [sys.executable, '-m', 'pip', 'install', '--quiet', package],
+            [sys.executable, '-m', 'pip', 'install', '--quiet', package, '--break-system-packages'],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             check=False
